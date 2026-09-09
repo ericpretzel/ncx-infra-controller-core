@@ -7906,13 +7906,14 @@ async fn test_factory_reset_bmc_on_release_sanitizes_host_bmc(
     use carbide_secrets::credentials::{
         BmcCredentialType, CredentialKey, CredentialReader, CredentialWriter, Credentials,
     };
-    use model::bmc_suppression::BmcSuppressionSubsystem;
+    use model::bmc_suppression::{BmcSuppressionSource, BmcSuppressionSubsystem};
     use model::machine::HostPlatformConfigurationState;
 
     const FACTORY_USER: &str = "root";
     const FACTORY_PW: &str = "factory-default";
     const PER_DEVICE_PW: &str = "prev-per-device";
     const SITE_EXPLORER: BmcSuppressionSubsystem = BmcSuppressionSubsystem::SiteExplorer;
+    const FACTORY_RESET: BmcSuppressionSource = BmcSuppressionSource::FactoryResetBmc;
 
     let pool = PgPoolOptions::new().connect_with(options).await.unwrap();
 
@@ -8009,7 +8010,7 @@ async fn test_factory_reset_bmc_on_release_sanitizes_host_bmc(
 
         if !acknowledged
             && let Some(suppression) =
-                db::bmc_suppression::find(&env.pool, host_bmc_mac, SITE_EXPLORER)
+                db::bmc_suppression::find(&env.pool, host_bmc_mac, SITE_EXPLORER, FACTORY_RESET)
                     .await
                     .unwrap()
             && suppression.acknowledged_at.is_none()
@@ -8096,10 +8097,9 @@ async fn test_factory_reset_bmc_on_release_sanitizes_host_bmc(
 
     // RemoveSuppression deletes the row it created.
     assert!(
-        db::bmc_suppression::find(&env.pool, host_bmc_mac, SITE_EXPLORER)
+        !db::bmc_suppression::is_suppressed(&env.pool, host_bmc_mac, SITE_EXPLORER)
             .await
-            .unwrap()
-            .is_none(),
+            .unwrap(),
         "RemoveSuppression must delete the site-explorer suppression"
     );
 
