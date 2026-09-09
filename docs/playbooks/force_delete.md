@@ -37,7 +37,8 @@ machines and instances running on top of them from the database, and clean up as
 It accepts the machine-id, hostname, MAC or IP of either the managed host or DPU as input,
 and will delete information about both of them (since they are heavily coupled).
 
-It returns all machine-ids and instance-ids it acted on, as well as the BMC information for the host.
+It returns all machine-ids and instance-ids it acted on, as well as the BMC
+IP for the managed host.
 
 Example:
 
@@ -55,16 +56,20 @@ retained boot targets), add:
   --delete-bmc-suppressions --delete-retained-boot-interfaces
 ```
 
-### 3. Use the returned BMC IP/port and machine-id to reboot the host
+### 3. Use the returned BMC IP and machine-id to reboot the host
 
 See [Rebooting a machine](machine_reboot.md).
-Supply the BMC IP and port of the managed host, as well as its `machine_id`
-as parameters.
+`machine force-delete` returns the managed host BMC IP and machine IDs; it
+does not return a BMC port. Supply the returned BMC IP, port `443` unless you
+know the device uses a different management port, and `machine_id` as
+parameters.
 
-By default, force-delete retains the last BMC credentials in Vault so that the
-site controller can continue to access the device. The optional
-`--delete-bmc-credentials` flag deletes those credentials; do not use it until
-any required device recovery is complete.
+When Site Explorer configured BMC credentials for the host, force-delete
+retains the last set in Vault by default so the site controller can continue
+to access the device. If no credentials were configured, there is nothing to
+retain and the site controller cannot access the BMC through Vault. The
+optional `--delete-bmc-credentials` flag deletes configured credentials; do
+not use it until any required device recovery is complete.
 
 Once a reboot is triggered, the DPU of the Machine should boot into the
 NICo discovery image again. This should initiate DPU discovery. A second

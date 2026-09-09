@@ -151,8 +151,9 @@ For the step-by-step operator view, refer to
 
 Decommission managed hosts, switches, and power shelves when hardware is
 leaving the site or should be ingested again from a clean pre-ingestion
-state. After `Decommissioning/Decommissioned`, force-delete the records. Refer
-to [Decommission NICo-managed hardware](../decommissioning/index.md).
+state. After `Decommissioning/Decommissioned`, force-delete the records from
+this site or move the hardware to a new site. Refer to
+[Decommission NICo-managed hardware](../decommissioning/index.md).
 
 ### Break-Fix
 

@@ -474,7 +474,7 @@ settings, and clears the host UEFI password. `DeconfiguringDpus` removes DPF
 resources when applicable and installs the vanilla `preingestion.bfb` on every
 DPU.
 
-Refer to [Decommission hosts and DPUs](../../decommissioning/hosts.md) for the
+Refer to [Decommission Managed Hosts and DPUs](../../decommissioning/hosts.md) for the
 operator procedure, platform limitations, and intended post-reset state.
 
 ## Instance Assignment State Details (InstanceState)

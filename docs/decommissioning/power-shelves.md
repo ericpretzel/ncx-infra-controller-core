@@ -1,4 +1,4 @@
-# Decommission power shelves
+# Decommission Managed Power Shelves
 
 Use this workflow to return a managed power shelf BMC or power-management
 controller (PMC) to its factory baseline. After the shelf reaches
@@ -44,9 +44,12 @@ leaves `Ready` and enters `Decommissioning`.
 nico-admin-cli -a <api-url> power-shelf show <power-shelf-id>
 ```
 
-**Expected result**: The state reaches `Decommissioning/Decommissioned`. If a
-decommissioning step fails, the workflow stops and requires manual
-intervention. Inspect the controller outcome before intervening.
+**Expected result**: The state reaches `Decommissioning/Decommissioned`.
+Transient Redfish, database, or credentials-store failures usually leave the
+power shelf in the same decommissioning substate; the state controller retries
+on the next iteration. Intervene when the state or handler message indicates
+`manual_intervention_required` or the workflow stays blocked after retries.
+Inspect the controller outcome before intervening.
 
 ## What the workflow changes
 

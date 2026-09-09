@@ -1,4 +1,4 @@
-# Decommission hosts and DPUs
+# Decommission Managed Hosts and DPUs
 
 Use this workflow to return a managed host, its DPUs, BMCs, and credentials to
 a pre-ingestion baseline. After the host reaches
@@ -57,9 +57,11 @@ nico-admin-cli -a <api-url> managed-host show <host-machine-id>
 ```
 
 **Expected result**: The state reaches `Decommissioning/Decommissioned`. Use
-the state and handler message to identify a blocked operation. If a
-decommissioning step fails, the workflow stops and requires manual
-intervention.
+the state and handler message to identify a blocked operation. Transient
+Redfish, RMS, database, or credentials-store failures usually leave the host
+in the same decommissioning substate; the state controller retries on the
+next iteration. Intervene when the state or handler message indicates
+`manual_intervention_required` or the workflow stays blocked after retries.
 
 ## What the workflow changes
 

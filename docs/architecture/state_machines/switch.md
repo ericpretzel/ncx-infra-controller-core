@@ -140,12 +140,12 @@ The `Maintenance` state is entered when `switch_maintenance_requested` is posted
 Managed-switch decommissioning requires the RMS switch backend and starts only
 from `Ready`. The workflow does not poll the RMS factory-reset job to
 completion; it continues after DHCP acknowledges the NVOS suppression. Refer to
-[Decommission managed switches](../../decommissioning/switches.md) for the
+[Decommission Managed Switches](../../decommissioning/switches.md) for the
 operator procedure and intended post-reset state.
 
 ## Implementation
 
 - **State type**: `SwitchControllerState` in `crates/api-model/src/switch/mod.rs`.
-- **Handlers**: `crates/switch-controller/src/` — one module per top-level state (`created`, `initializing`, `configuring`, `fetch_info`, `validating`, `bom_validating`, `ready`, `maintenance`, `reprovisioning`, `error_state`, `deleting`).
+- **Handlers**: `crates/switch-controller/src/` — one module per top-level state (`created`, `initializing`, `configuring`, `fetch_info`, `validating`, `bom_validating`, `ready`, `decommissioning`, `maintenance`, `reprovisioning`, `error_state`, `deleting`).
 - **Certificate configuration design**: [switch_configure_certificate.md](switch_configure_certificate.md).
 - **Orchestration**: `SwitchStateHandler` in `handler.rs` delegates to the handler for the current `controller_state`.

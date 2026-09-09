@@ -198,12 +198,14 @@ navigation:
           contents:
             - page: Overview
               path: decommissioning/index.md
-            - page: Hosts and DPUs
+            - page: Decommission Managed Hosts and DPUs
               path: decommissioning/hosts.md
-            - page: Managed Switches
+            - page: Decommission Managed Switches
               path: decommissioning/switches.md
-            - page: Power Shelves
+            - page: Decommission Managed Power Shelves
               path: decommissioning/power-shelves.md
+            - page: Rack-Scale Decommissioning
+              path: decommissioning/racks.md
         - page: DHCP Suppression
           path: operations/dhcp-suppression.md
         - page: Network Isolation

@@ -29,9 +29,10 @@ the devices can be unrecoverable.
 
 Related guidance:
 
-- [Decommission hosts and DPUs](hosts.md)
-- [Decommission managed switches](switches.md)
-- [Decommission power shelves](power-shelves.md)
+- [Decommission Managed Hosts and DPUs](hosts.md)
+- [Decommission Managed Switches](switches.md)
+- [Decommission Managed Power Shelves](power-shelves.md)
+- [Rack-Scale Decommissioning](racks.md)
 - [Tenant Lifecycle Cleanup](../operations/tenant-lifecycle-cleanup.md)
 - [Force deleting and rebuilding NICo hosts](../playbooks/force_delete.md)
 
@@ -50,12 +51,12 @@ Related guidance:
 
 ## Choose a procedure
 
-- [Decommission hosts and DPUs](hosts.md) resets host firmware configuration,
+- [Decommission Managed Hosts and DPUs](hosts.md): reset host firmware configuration,
   SuperNIC lockdown, DPU images, host and DPU BMCs, and managed credentials.
-- [Decommission managed switches](switches.md) factory-resets NVOS and the
-  switch BMC, then removes managed NVOS and BMC credentials.
-- [Decommission power shelves](power-shelves.md) factory-resets the shelf BMC
-  or PMC, then removes its managed BMC credential.
+- [Decommission Managed Switches](switches.md): factory-reset NVOS and the switch BMC, then
+  remove managed NVOS and BMC credentials.
+- [Decommission Managed Power Shelves](power-shelves.md): factory-reset the shelf BMC or
+  PMC, then remove its managed BMC credential.
 
 ## Decommission a rack
 
@@ -70,7 +71,9 @@ and rack power management stay available while compute devices reset:
    `Decommissioning/Decommissioned`.
 
 **Expected result**: Every in-scope device is in `Decommissioning/Decommissioned`.
-If a step fails, the workflow stops and requires manual intervention.
+A transient failure on one device usually retries automatically in the same
+decommissioning substate. Intervene when monitoring shows
+`manual_intervention_required` or a persistent handler error on that device.
 
 After those steps finish, remove the hardware from this site with
 [force-delete](#force-delete-after-decommissioning), or move it to a new

@@ -1,4 +1,4 @@
-# Decommission managed switches
+# Decommission Managed Switches
 
 Use this workflow to return a managed NVIDIA switch to a factory baseline.
 After the switch reaches `Decommissioning/Decommissioned`, force-delete it to
@@ -48,9 +48,12 @@ leaves `Ready` and enters `Decommissioning`.
 nico-admin-cli -a <api-url> managed-switch show <switch-id>
 ```
 
-**Expected result**: The state reaches `Decommissioning/Decommissioned`. If a
-decommissioning step fails, the workflow stops and requires manual
-intervention. Inspect the controller outcome before intervening.
+**Expected result**: The state reaches `Decommissioning/Decommissioned`.
+Transient Redfish, RMS, database, or credentials-store failures usually leave
+the switch in the same decommissioning substate; the state controller retries
+on the next iteration. Intervene when the state or handler message indicates
+`manual_intervention_required` or the workflow stays blocked after retries.
+Inspect the controller outcome before intervening.
 
 ## What the workflow changes
 

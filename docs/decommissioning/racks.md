@@ -1,4 +1,4 @@
-# Rack-Scale Decommissioning with NICo Flow
+# Rack-Scale Decommissioning
 
 ## Overview
 
@@ -15,7 +15,7 @@ off once `DecommissionSwitch` and `DecommissionPowerShelf` are also available.
 
 ## API
 
-```
+```protobuf
 rpc DecommissionRack(DecommissionRackRequest) returns (SubmitTaskResponse);
 ```
 
@@ -28,8 +28,10 @@ rpc DecommissionRack(DecommissionRackRequest) returns (SubmitTaskResponse);
 | `queue_options` | `QueueOptions` | Optional queue-conflict policy override. |
 | `rule_id` | `UUID` | Optional override to use a specific operation rule instead of the default. |
 
-One independent Flow task is created per rack. The call returns immediately with
-the task IDs; progress is tracked via `ListTasks` / `GetTasksByIDs`.
+While the `Unimplemented` guard is in place, the RPC returns immediately with
+that error and creates no tasks. After the guard is removed, one independent
+Flow task is created per rack. The call returns immediately with the task IDs;
+progress is tracked via `ListTasks` / `GetTasksByIDs`.
 
 ---
 
@@ -38,7 +40,7 @@ the task IDs; progress is tracked via `ListTasks` / `GetTasksByIDs`.
 The default decommission rule drives three sequential stages. A failure in any
 stage aborts the task; earlier stages are not rolled back.
 
-```
+```text
 Stage 1 — Compute
   MainOperation:  DecommissionControl   (instructs Core to begin decommissioning)
   PostOperation:  WaitDecommissioned    (polls until all compute nodes are terminal)
@@ -58,7 +60,9 @@ Stage 3 — PowerShelf
 |---|---|
 | Per-stage timeout | 4 hours |
 | Poll interval | 30 seconds |
-| Retry (per stage) | 3 attempts, 30 s initial interval, 2× backoff |
+| `DecommissionControl` retries | 1 Temporal attempt; 5 minute activity timeout |
+| `GetDecommissionStatus` retries | 1 Temporal attempt per poll; poll loop retries until stage timeout |
+| Consecutive status-poll error budget | 5 minutes |
 | Max parallel components | unlimited (0) |
 
 ---
@@ -106,7 +110,7 @@ The `DecommissionRack` RPC is exposed to the REST API and site-workflow layers
 via the Flow client proto mirror at `rest-api/proto/flow/`. The mirror is kept in
 sync by running:
 
-```
+```sh
 make -C rest-api flow-proto
 ```
 
