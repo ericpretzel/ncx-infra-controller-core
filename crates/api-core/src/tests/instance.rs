@@ -7912,8 +7912,6 @@ async fn test_factory_reset_bmc_on_release_sanitizes_host_bmc(
     const FACTORY_USER: &str = "root";
     const FACTORY_PW: &str = "factory-default";
     const PER_DEVICE_PW: &str = "prev-per-device";
-    const SITE_EXPLORER: BmcSuppressionSubsystem = BmcSuppressionSubsystem::SiteExplorer;
-    const FACTORY_RESET: BmcSuppressionSource = BmcSuppressionSource::FactoryResetBmc;
 
     let pool = PgPoolOptions::new().connect_with(options).await.unwrap();
 
@@ -8009,16 +8007,24 @@ async fn test_factory_reset_bmc_on_release_sanitizes_host_bmc(
         env.run_machine_state_controller_iteration().await;
 
         if !acknowledged
-            && let Some(suppression) =
-                db::bmc_suppression::find(&env.pool, host_bmc_mac, SITE_EXPLORER, FACTORY_RESET)
-                    .await
-                    .unwrap()
+            && let Some(suppression) = db::bmc_suppression::find(
+                &env.pool,
+                host_bmc_mac,
+                BmcSuppressionSubsystem::SiteExplorer,
+                BmcSuppressionSource::FactoryResetBmc,
+            )
+            .await
+            .unwrap()
             && suppression.acknowledged_at.is_none()
         {
             let mut txn = env.pool.begin().await.unwrap();
-            db::bmc_suppression::acknowledge(txn.as_mut(), host_bmc_mac, SITE_EXPLORER)
-                .await
-                .unwrap();
+            db::bmc_suppression::acknowledge(
+                txn.as_mut(),
+                host_bmc_mac,
+                BmcSuppressionSubsystem::SiteExplorer,
+            )
+            .await
+            .unwrap();
             txn.commit().await.unwrap();
             acknowledged = true;
         }
@@ -8097,9 +8103,13 @@ async fn test_factory_reset_bmc_on_release_sanitizes_host_bmc(
 
     // RemoveSuppression deletes the row it created.
     assert!(
-        !db::bmc_suppression::is_suppressed(&env.pool, host_bmc_mac, SITE_EXPLORER)
-            .await
-            .unwrap(),
+        !db::bmc_suppression::is_suppressed(
+            &env.pool,
+            host_bmc_mac,
+            BmcSuppressionSubsystem::SiteExplorer,
+        )
+        .await
+        .unwrap(),
         "RemoveSuppression must delete the site-explorer suppression"
     );
 

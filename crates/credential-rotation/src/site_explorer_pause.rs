@@ -183,8 +183,6 @@ mod tests {
 
     use super::{GateDecision, gate_before_credential_change};
 
-    const ROTATION: BmcSuppressionSource = BmcSuppressionSource::BmcCredentialRotation;
-
     fn mac(last: u8) -> MacAddress {
         MacAddress::new([0x02, 0, 0, 0, 0, last])
     }
@@ -192,7 +190,7 @@ mod tests {
     #[carbide_macros::sqlx_test]
     async fn an_empty_scope_proceeds(pool: PgPool) {
         assert_eq!(
-            gate_before_credential_change(&pool, &[], ROTATION)
+            gate_before_credential_change(&pool, &[], BmcSuppressionSource::BmcCredentialRotation,)
                 .await
                 .unwrap(),
             GateDecision::Proceed
@@ -205,9 +203,13 @@ mod tests {
 
         // First pass records the suppressions; nothing is acknowledged yet.
         assert_eq!(
-            gate_before_credential_change(&pool, &macs, ROTATION)
-                .await
-                .unwrap(),
+            gate_before_credential_change(
+                &pool,
+                &macs,
+                BmcSuppressionSource::BmcCredentialRotation,
+            )
+            .await
+            .unwrap(),
             GateDecision::Wait
         );
 
@@ -224,9 +226,13 @@ mod tests {
         );
         txn.commit().await.unwrap();
         assert_eq!(
-            gate_before_credential_change(&pool, &macs, ROTATION)
-                .await
-                .unwrap(),
+            gate_before_credential_change(
+                &pool,
+                &macs,
+                BmcSuppressionSource::BmcCredentialRotation,
+            )
+            .await
+            .unwrap(),
             GateDecision::Wait
         );
 
@@ -243,9 +249,13 @@ mod tests {
         );
         txn.commit().await.unwrap();
         assert_eq!(
-            gate_before_credential_change(&pool, &macs, ROTATION)
-                .await
-                .unwrap(),
+            gate_before_credential_change(
+                &pool,
+                &macs,
+                BmcSuppressionSource::BmcCredentialRotation,
+            )
+            .await
+            .unwrap(),
             GateDecision::Proceed
         );
     }
